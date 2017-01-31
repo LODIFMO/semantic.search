@@ -1,0 +1,20 @@
+PREFIX bibo: <http://purl.org/ontology/bibo/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT 
+DISTINCT ?URI ?Title ?Authors ?Date ?Abstract
+FROM <http://data.open.ac.uk/context/oro>
+WHERE { 
+    [] a bibo:Article ;
+         bibo:uri ?URI ;
+         bibo:authorList ?Authors ;
+         bibo:abstract ?Abstract ;
+         dcterms:title ?Title ;
+         dcterms:date ?Date .
+
+}
+GROUP BY ?URI ?Title ?Authors ?Date ?Abstract
+LIMIT 10
+
