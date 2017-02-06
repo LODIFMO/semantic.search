@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -19,7 +20,7 @@ import org.apache.jena.query.Syntax;
  * @author geras
  */
 @ManagedBean
-@SessionScoped
+@ViewScoped
 public class SearchBean
         implements Serializable
 {
@@ -30,8 +31,21 @@ public class SearchBean
 
     private String keyword;
 
-    private List<Publication> publications = new ArrayList<>();
+    private List<Publication> publications;
+    private Publication selected;
 
+    public Publication getSelected() {
+        return selected;
+    }
+     public void setSelected(Publication selected) {
+        this.selected = selected;
+    }
+
+    @PostConstruct
+    protected void init()
+    {
+         publications = new ArrayList<>();
+    }
     public String getKeyword()
     {
         log.info("SearchBean: getKeyword with value: " + keyword);
@@ -53,20 +67,25 @@ public class SearchBean
 
     public String getOutput()
     {
+        log.info("SearchBean: getOutput");
         if (keyword.isEmpty())
         {
             output = "Your query is empty";
             return output;
         }
-        execSelect();
-        log.info("SearchBean: getOutput");
+        else
+        {
+            execSelect();
+            output ="There are " + publications.size() + " publications for your query:";
+        }
         return output;
     }
 
     private void execSelect()
     {
+        //publications.add(new Publication("source", "1", "title", "aut", "date", ".."));
         execSelectToOU();
-        execSelectToEurope();
+        //execSelectToEurope();
     }
 
 //    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

@@ -1,42 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <f:metadata>
         <f:viewParam name="keyword" value="#{searchBean.keyword}" />
     </f:metadata>
-    <head>
-        <title>Result</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <div> #{searchBean.output}</div>
-    <p:dataTable var="publication" value="#{searchBean.publications}" resizableColumns="true" style="margin-bottom:20px" 
-                 >
-<!--    <p:column headerText="URI">
-        <h:outputText value="#{publication.uri}" />
-    </p:column>-->
-        
-    <p:column headerText="Source">
-        <h:outputText value="#{publication.source}" />
-    </p:column>
- 
-    <p:column headerText="Title">
-        <h:outputText value="#{publication.title}" />
-    </p:column>
- 
-<!--    <p:column headerText="Authors">
-        <h:outputText value="#{publication.authors}" />
-    </p:column>-->
-    <p:column headerText="Date">
-        <h:outputText value="#{publication.date}" />
-    </p:column>
-        <f:facet name="header">
-            There are #{fn:length(searchBean.publications)} publications for your query:
-            <br/>
-        </f:facet>
-<!--    <p:column headerText="Abstract">
-        <h:outputText value="#{publication.abstract}" />
-    </p:column>-->
-</p:dataTable>
+    <h:head>
+        <title>Semantic search</title>
+    </h:head>
+    <h:body>
+        <h:form id="form">
+        <p:dataTable id="publications_data" var="publication" value="#{searchBean.publications}">
+            <f:facet name="header">
+                #{searchBean.output}
+            </f:facet>
+            <p:column headerText="Source">
+                <h:outputText value="#{publication.source}" />
+            </p:column>
+
+            <p:column headerText="Title">
+                <h:outputText value="#{publication.title}" />
+            </p:column>
+
+            <p:column headerText="Date">
+                <h:outputText value="#{publication.date}" />
+            </p:column>
+
+            <p:column style="width:32px;text-align: center">
+                <p:commandButton update=":form:publicationDetail" oncomplete="PF('publicationDialog').show()" icon="ui-icon-search" title="View">
+                    <f:setPropertyActionListener value="#{publication}" target="#{searchBean.selected}" />
+                </p:commandButton>
+            </p:column>
+        </p:dataTable>
+
+        <p:dialog header="Publication Info" widgetVar="publicationDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+            <p:outputPanel id="publicationDetail" style="text-align:center;">
+                <p:panelGrid  columns="2" rendered="#{not empty searchBean.selected}" columnClasses="label,value">
+
+                    <h:outputText value="Source" />
+                    <h:outputText value="#{searchBean.selected.source}" />
+
+                <h:outputText value="URI" />
+                    <h:outputText value="#{searchBean.selected.uri}" />
+
+                    <h:outputText value="Title" />
+                    <h:outputText value="#{searchBean.selected.title}" />
+
+                    <h:outputText value="Authors" />
+                    <h:outputText value="#{searchBean.selected.authors}" />
+
+                    <h:outputText value="Date" />
+                    <h:outputText value="#{searchBean.selected.date}" />
+
+                    <h:outputText value="Abstract" />
+                    <h:outputText value="#{searchBean.selected.abstract}" />
+                </p:panelGrid>
+            </p:outputPanel>
+        </p:dialog>
+        </h:form>
+    </h:body>
 </html>
