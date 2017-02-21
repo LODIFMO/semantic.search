@@ -1,4 +1,4 @@
-package com.gerasin.oleg.semantic_search;
+package com.gerasin.oleg.semanticsearch;
 
 /**
  *

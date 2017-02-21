@@ -1,95 +1,36 @@
-package com.gerasin.oleg.semantic_search;
+package com.gerasin.oleg.semanticsearch;
 
-import java.io.Serializable;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.Syntax;
 
 /**
+ * Костыли - наше всё!
  *
  * @author geras
  */
-@ManagedBean
-@ViewScoped
-public class SearchBean
-        implements Serializable
+public class SparqlHelper
 {
-
-    public static final long serialVersionUID = 1L;
-
-    private static Logger log = Logger.getLogger(SearchBean.class.getName());
-
+    private List<Publication> publications = new ArrayList<>();
     private String keyword;
 
-    private List<Publication> publications;
-    private Publication selected;
-
-    public Publication getSelected() {
-        return selected;
-    }
-     public void setSelected(Publication selected) {
-        this.selected = selected;
-    }
-
-    @PostConstruct
-    protected void init()
-    {
-         publications = new ArrayList<>();
-    }
-    public String getKeyword()
-    {
-        log.info("SearchBean: getKeyword with value: " + keyword);
-        return keyword;
-    }
-
-    public void setKeyword(String keyword)
+    public List<Publication> execSelect(String keyword)
     {
         this.keyword = keyword;
-        log.info("SearchBean: setKeyword with value: " + keyword);
-    }
-
-    public List<Publication> getPublications()
-    {
+        execSelectToOu();
+        //execSelectToEurope();
         return publications;
     }
 
-    private String output = "";
-
-    public String getOutput()
-    {
-        log.info("SearchBean: getOutput");
-        if (keyword.isEmpty())
-        {
-            output = "Your query is empty";
-            return output;
-        }
-        else
-        {
-            execSelect();
-            output ="There are " + publications.size() + " publications for your query:";
-        }
-        return output;
-    }
-
-    private void execSelect()
-    {
-        //publications.add(new Publication("source", "1", "title", "aut", "date", ".."));
-        execSelectToOU();
-        //execSelectToEurope();
-    }
-
-//    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    private void execSelectToEurope()
+    public void execSelectToEurope()
     {
         Query query = QueryFactory.create(getStringForEurope(),
                 Syntax.syntaxARQ);
@@ -97,8 +38,6 @@ public class SearchBean
         QueryExecution qe = QueryExecutionFactory.sparqlService("http://publications.europa.eu/webapi/rdf/sparql",
                 query);
         ResultSet results = qe.execSelect();
-//        ResultSetFormatter.outputAsJSON(outputStream, results);
-//        output = outputStream.toString();
 
         while (results.hasNext())
         {
@@ -113,7 +52,22 @@ public class SearchBean
         }
     }
 
-    private void execSelectToOU()
+    public String getJsonOutputForKeyword(String keyword)
+    {
+        this.keyword = keyword;
+        Query query = QueryFactory.create(getStringForOU(),
+                Syntax.syntaxARQ);
+        query.setLimit(10);
+        QueryExecution qe = QueryExecutionFactory.sparqlService("http://data.open.ac.uk/sparql?force=true",
+                query);
+        ResultSet results = qe.execSelect();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ResultSetFormatter.outputAsJSON(outputStream, results);
+        return outputStream.toString();
+    }
+
+    public void execSelectToOu()
     {
         Query query = QueryFactory.create(getStringForOU(),
                 Syntax.syntaxARQ);
@@ -125,6 +79,10 @@ public class SearchBean
         while (results.hasNext())
         {
             QuerySolution qs = results.next();
+            if ( !qs.contains("URI") )
+            {
+                return;
+            }
             String source = "Open University";
             String uri = qs.get("URI").toString();
             String title = qs.get("title").toString();
@@ -136,7 +94,7 @@ public class SearchBean
         }
     }
 
-    private String getStringForEurope()
+    public String getStringForEurope()
     {
         return "PREFIX cdm:<http://publications.europa.eu/ontology/cdm#> "
                 + "PREFIX skos:<http://www.w3.org/2004/02/skos/core#> "
@@ -166,7 +124,7 @@ public class SearchBean
                 + "GROUP BY ?work ?date";
     }
 
-    private String getStringForOU()
+    public String getStringForOU()
     {
         return "PREFIX bibo: <http://purl.org/ontology/bibo/>  "
                 + "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  "
@@ -191,5 +149,4 @@ public class SearchBean
                 + "GROUP BY ?title ?authors ?date ?abstract "
                 + "LIMIT 10";
     }
-
 }
