@@ -1,4 +1,4 @@
-package com.gerasin.oleg.semanticsearch;
+package model;
 
 /**
  *
@@ -12,6 +12,20 @@ public class Publication
     private String Authors;
     private String Date;
     private String Abstract;
+
+    public Publication()
+    {
+    }
+
+    public Publication(String Source, String URI, String Title, String Authors, String Date, String Abstract)
+    {
+        this.Source = Source;
+        this.Uri = URI;
+        this.Title = Title;
+        this.Authors = Authors;
+        this.Date = Date;
+        this.Abstract = Abstract;
+    }
 
     public String getSource()
     {
@@ -72,15 +86,4 @@ public class Publication
     {
         this.Abstract = Abstract;
     }
-
-    public Publication(String Source, String URI, String Title, String Authors, String Date, String Abstract)
-    {
-        this.Source = Source;
-        this.Uri = URI;
-        this.Title = Title;
-        this.Authors = Authors;
-        this.Date = Date;
-        this.Abstract = Abstract;
-    }
-
 }

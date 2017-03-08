@@ -1,5 +1,6 @@
 package com.gerasin.oleg.semanticsearch;
 
+import model.Publication;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;

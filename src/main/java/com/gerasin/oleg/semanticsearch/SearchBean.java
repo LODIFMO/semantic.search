@@ -1,8 +1,10 @@
 package com.gerasin.oleg.semanticsearch;
 
+import model.Publication;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -22,6 +24,7 @@ public class SearchBean
 
     private static Logger log = Logger.getLogger(SearchBean.class.getName());
     private SparqlHelper sparqlHelper = new SparqlHelper();
+    private DbHelper dbHelper = new DbHelper();
 
     private String keyword;
 
@@ -69,9 +72,26 @@ public class SearchBean
         }
         else
         {
-            publications = sparqlHelper.execSelect(keyword);
+            searchPublications();
             output ="There are " + publications.size() + " publications for your query:";
         }
         return output;
     }
+
+    private void searchPublications()
+    {
+        List<Publication> cachedPublications = dbHelper.getCachedPublications(keyword);
+        if (cachedPublications == null)
+        {
+            log.info("SearchBean: cachedPublications == null ");
+            publications = sparqlHelper.execSelect(keyword);
+            dbHelper.createLog(keyword, publications);
+        }
+        else
+        {
+            log.log(Level.INFO, "SearchBean: cachedPublications == {0}", cachedPublications);
+            publications = cachedPublications;
+        }
+    }
+
 }
