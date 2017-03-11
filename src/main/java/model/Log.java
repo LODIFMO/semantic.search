@@ -10,9 +10,15 @@ import org.mongodb.morphia.annotations.Id;
  *
  * @author geras
  */
-@Entity("Log")
+@Entity(Log.ENTITY_NAME)
 public class Log
 {
+    public static final String ENTITY_NAME = "Log";
+    
+    public static final String KEYWORD = "keyword";
+    public static final String DATE = "date";
+    public static final String PUBLICATIONS = "publications";
+
     @Id
     private ObjectId id;
     private String keyword;
