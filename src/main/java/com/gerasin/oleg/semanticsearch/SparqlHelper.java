@@ -1,9 +1,23 @@
 package com.gerasin.oleg.semanticsearch;
 
+import freemarker.cache.WebappTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import model.Publication;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -14,7 +28,7 @@ import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.Syntax;
 
 /**
- * Костыли - наше всё!
+ *
  *
  * @author geras
  */
@@ -127,27 +141,32 @@ public class SparqlHelper
 
     public String getStringForOU()
     {
-        return "PREFIX bibo: <http://purl.org/ontology/bibo/>  "
-                + "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  "
-                + "PREFIX dcterms: <http://purl.org/dc/terms/>  "
-                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-                + ""
-                + "SELECT "
-                + "distinct (group_concat(distinct ?URI_) as ?URI) ?title ?authors ?date ?abstract "
-                + "FROM <http://data.open.ac.uk/context/oro> "
-                + "WHERE { "
-                + "      [] a bibo:Article ;"
-                + "       bibo:uri ?URI_ ;"
-                + "       bibo:authorList ?authors ;"
-                + "       bibo:abstract ?abstract ;"
-                + "       dcterms:title ?title ;"
-                + "       dcterms:date ?date ."
-                + "FILTER (regex( str(?title), \""
-                + keyword
-                + "\", \"i\")). "
-                + " "
-                + "} "
-                + "GROUP BY ?title ?authors ?date ?abstract "
-                + "LIMIT 10";
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_25);
+         try
+        {
+            cfg.setTemplateLoader(
+                    new WebappTemplateLoader(
+                            (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext(),
+                            "/WEB-INF/query/") );
+
+            cfg.setDefaultEncoding("UTF-8");
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+            cfg.setLogTemplateExceptions(false);
+
+            Template temp = cfg.getTemplate("ou.ftl");
+            Map<String, Object> data = new HashMap<>();
+            data.put("keyword", keyword);
+            Writer out = new StringWriter();
+            temp.process(data, out);
+            Logger.getLogger(SparqlHelper.class.getName()).log(Level.INFO, "return {0}", out.toString());
+            return out.toString();
+        }
+        catch (IOException | TemplateException ex)
+        {
+            Logger.getLogger(SparqlHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        Logger.getLogger(SparqlHelper.class.getName()).info("return empty");
+        return "";
     }
 }
