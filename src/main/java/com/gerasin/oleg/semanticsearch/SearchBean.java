@@ -23,10 +23,11 @@ public class SearchBean
     public static final long serialVersionUID = 1L;
 
     private static Logger log = Logger.getLogger(SearchBean.class.getName());
-    private SparqlHelper sparqlHelper = new SparqlHelper();
-    private DbHelper dbHelper = new DbHelper();
+    private final SparqlHelper sparqlHelper = new SparqlHelper();
+    private final DbHelper dbHelper = new DbHelper();
 
     private String keyword;
+    private Boolean cachedSearch = true;
 
     private List<Publication> publications;
     private Publication selected;
@@ -55,6 +56,16 @@ public class SearchBean
         log.info("SearchBean: setKeyword with value: " + keyword);
     }
 
+    public Boolean getCachedSearch()
+    {
+        return cachedSearch;
+    }
+
+    public void setCachedSearch(Boolean cachedSearch)
+    {
+        this.cachedSearch = cachedSearch;
+    }
+
     public List<Publication> getPublications()
     {
         return publications;
@@ -81,7 +92,7 @@ public class SearchBean
     private void searchPublications()
     {
         List<Publication> cachedPublications = dbHelper.getCachedPublications(keyword);
-        if (cachedPublications == null)
+        if (!cachedSearch || cachedPublications == null)
         {
             log.info("SearchBean: cachedPublications == null ");
             publications = sparqlHelper.execSelect(keyword);

@@ -15,9 +15,10 @@ public class IndexBean
         implements Serializable
 {
     public static final long serialVersionUID = 1L;
-    
+
     private String keyword;
-    
+    private Boolean cachedSearch = true;
+
     private static Logger log = Logger.getLogger(IndexBean.class.getName());
 
     public String getKeyword()
@@ -31,5 +32,14 @@ public class IndexBean
         this.keyword = keyword;
         log.info("IndexBean: setKeyword with value: " + keyword);
     }
-    
+
+    public Boolean getCachedSearch()
+    {
+        return cachedSearch;
+    }
+
+    public void setCachedSearch(Boolean cachedSearch)
+    {
+        this.cachedSearch = cachedSearch;
+    }
 }

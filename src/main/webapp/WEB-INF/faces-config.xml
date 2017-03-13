@@ -10,6 +10,10 @@
                     <name>keyword</name>
                     <value>#{indexBean.keyword}</value>
                 </view-param>
+                <view-param>
+                    <name>cachedSearch</name>
+                    <value>#{indexBean.cachedSearch}</value>
+                </view-param>
             </redirect>
         </navigation-case>
     </navigation-rule>
