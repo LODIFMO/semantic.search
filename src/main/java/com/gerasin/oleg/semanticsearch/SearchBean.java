@@ -1,33 +1,38 @@
 package com.gerasin.oleg.semanticsearch;
 
-import model.Publication;
+import com.gerasin.oleg.semanticsearch.model.Publication;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
  * @author geras
  */
-@ManagedBean
+@Named
 @ViewScoped
 public class SearchBean
         implements Serializable
 {
+    private static org.apache.logging.log4j.Logger log = LogManager.getLogger(SearchBean.class.getName());
 
-    public static final long serialVersionUID = 1L;
-
-    private static Logger log = Logger.getLogger(SearchBean.class.getName());
-    private final SparqlHelper sparqlHelper = new SparqlHelper();
-    private final DbHelper dbHelper = new DbHelper();
+    @Inject
+    private SparqlHelper sparqlHelper;
+    @Inject
+    private DbHelper dbHelper;
 
     private String keyword;
     private Boolean cachedSearch = true;
+    private String[] selectedSources;
 
     private List<Publication> publications;
     private Publication selected;
@@ -43,17 +48,28 @@ public class SearchBean
     protected void init()
     {
          publications = new ArrayList<>();
+
+         Map<String, String> parameterMap =
+                 FacesContext.getCurrentInstance()
+                         .getExternalContext()
+                         .getRequestParameterMap();
+
+         setKeyword(parameterMap.get("keyword"));
+         setCachedSearch(Boolean.parseBoolean(parameterMap.get("cachedSearch")));
+         String sources = parameterMap.get("selectedSources");
+         if (sources != null && !sources.isEmpty())
+            setSelectedSources(parameterMap.get("selectedSources").split(","));
     }
     public String getKeyword()
     {
-        log.info("SearchBean: getKeyword with value: " + keyword);
+        log.info("getKeyword with value: {}", keyword);
         return keyword;
     }
 
     public void setKeyword(String keyword)
     {
         this.keyword = keyword;
-        log.info("SearchBean: setKeyword with value: " + keyword);
+        log.info("setKeyword with value: {}", keyword);
     }
 
     public Boolean getCachedSearch()
@@ -66,6 +82,17 @@ public class SearchBean
         this.cachedSearch = cachedSearch;
     }
 
+    public String[] getSelectedSources()
+    {
+        return selectedSources;
+    }
+
+    public void setSelectedSources(String[] selectedSources)
+    {
+        log.info("selectedSources = {}", Arrays.toString(selectedSources));
+        this.selectedSources = selectedSources;
+    }
+
     public List<Publication> getPublications()
     {
         return publications;
@@ -75,8 +102,8 @@ public class SearchBean
 
     public String getOutput()
     {
-        log.info("SearchBean: getOutput");
-        if (keyword.isEmpty())
+        log.info("getOutput");
+        if (keyword == null || keyword.isEmpty())
         {
             output = "Your query is empty";
             return output;
@@ -91,17 +118,24 @@ public class SearchBean
 
     private void searchPublications()
     {
-        List<Publication> cachedPublications = dbHelper.getCachedPublications(keyword);
-        if (!cachedSearch || cachedPublications == null)
+        List<String> selectedSourcesList = Arrays.asList(selectedSources);
+        List<Publication> cachedPublications = null;
+        if (cachedSearch)
         {
-            log.info("SearchBean: cachedPublications == null ");
-            publications = sparqlHelper.execSelect(keyword);
+            cachedPublications = dbHelper.getCachedPublications(keyword);
+        }
+        if (cachedPublications == null)
+        {
+            log.info("cachedPublications == null ");
+            publications = sparqlHelper.execSelect(keyword, selectedSourcesList);
             dbHelper.createLog(keyword, publications);
         }
         else
         {
-            log.log(Level.INFO, "SearchBean: cachedPublications == {0}", cachedPublications);
-            publications = cachedPublications;
+            log.info("size of cachedPublications == {}", cachedPublications.size());
+            publications = cachedPublications.stream()
+                    .filter(p -> selectedSourcesList.contains(p.getSource()))
+                    .collect(Collectors.toList());
         }
     }
 

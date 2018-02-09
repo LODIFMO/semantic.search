@@ -4,62 +4,60 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
-    <f:metadata>
-        <f:viewParam name="keyword" value="#{searchBean.keyword}" />
-        <f:viewParam name="cachedSearch" value="#{searchBean.cachedSearch}" />
-    </f:metadata>
     <h:head>
         <title>Semantic search</title>
     </h:head>
     <h:body>
         <h:form id="form">
-        <p:dataTable id="publications_data" var="publication" value="#{searchBean.publications}">
-            <f:facet name="header">
-                #{searchBean.output}
-            </f:facet>
-            <p:column headerText="Source">
-                <h:outputText value="#{publication.source}" />
-            </p:column>
+            <p:dataTable id="publications_data"
+                         var="publication"
+                         value="#{searchBean.publications}">
+                <f:facet name="header">
+                    #{searchBean.output}
+                </f:facet>
+                <p:column headerText="Source">
+                    <h:outputText value="#{publication.source}" />
+                </p:column>
 
-            <p:column headerText="Title">
-                <h:outputText value="#{publication.title}" />
-            </p:column>
+                <p:column headerText="Title">
+                    <h:outputText value="#{publication.title}" />
+                </p:column>
 
-            <p:column headerText="Date">
-                <h:outputText value="#{publication.date}" />
-            </p:column>
+                <p:column headerText="Date">
+                    <h:outputText value="#{publication.date}" />
+                </p:column>
 
-            <p:column style="width:32px;text-align: center">
-                <p:commandButton update=":form:publicationDetail" oncomplete="PF('publicationDialog').show()" icon="ui-icon-search" title="View">
-                    <f:setPropertyActionListener value="#{publication}" target="#{searchBean.selected}" />
-                </p:commandButton>
-            </p:column>
-        </p:dataTable>
+                <p:column style="width:32px;text-align: center">
+                    <p:commandButton update=":form:publicationDetail" oncomplete="PF('publicationDialog').show()" icon="ui-icon-search" title="View">
+                        <f:setPropertyActionListener value="#{publication}" target="#{searchBean.selected}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
 
-        <p:dialog header="Publication Info" widgetVar="publicationDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-            <p:outputPanel id="publicationDetail" style="text-align:center;">
-                <p:panelGrid  columns="2" rendered="#{not empty searchBean.selected}" columnClasses="label,value">
+            <p:dialog header="Publication Info" widgetVar="publicationDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="publicationDetail" style="text-align:center;">
+                    <p:panelGrid  columns="2" rendered="#{not empty searchBean.selected}" columnClasses="label,value">
 
-                    <h:outputText value="Source" />
-                    <h:outputText value="#{searchBean.selected.source}" />
+                        <h:outputText value="Source" />
+                        <h:outputText value="#{searchBean.selected.source}" />
 
-                <h:outputText value="URI" />
-                    <h:outputText value="#{searchBean.selected.uri}" />
+                        <h:outputText value="URI" />
+                        <h:outputText value="#{searchBean.selected.uri}" />
 
-                    <h:outputText value="Title" />
-                    <h:outputText value="#{searchBean.selected.title}" />
+                        <h:outputText value="Title" />
+                        <h:outputText value="#{searchBean.selected.title}" />
 
-                    <h:outputText value="Authors" />
-                    <h:outputText value="#{searchBean.selected.authors}" />
+                        <h:outputText value="Authors" />
+                        <h:outputText value="#{searchBean.selected.authors}" />
 
-                    <h:outputText value="Date" />
-                    <h:outputText value="#{searchBean.selected.date}" />
+                        <h:outputText value="Date" />
+                        <h:outputText value="#{searchBean.selected.date}" />
 
-                    <h:outputText value="Abstract" />
-                    <h:outputText value="#{searchBean.selected.abstract}" />
-                </p:panelGrid>
-            </p:outputPanel>
-        </p:dialog>
+                        <h:outputText value="Abstract" />
+                        <h:outputText value="#{searchBean.selected.abstract}" />
+                    </p:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
         </h:form>
     </h:body>
 </html>

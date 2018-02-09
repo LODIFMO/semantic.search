@@ -1,5 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui"
@@ -9,24 +7,29 @@
     </h:head>
     <h:body>
         <h:form>
-                <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-                    <h:outputText value="Your query: " />
-                    <p:inputText  id="query" value="#{indexBean.keyword}"/>
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                <h:outputLabel for="query" value="Your query: " />
+                <p:inputText  id="query" value="#{indexBean.keyword}"/>
 
-                </h:panelGrid>
+                <h:outputLabel for="multiple" value="Sources: " />
+                <p:selectCheckboxMenu id="multiple"
+                                      value="#{indexBean.selectedSources}"
+                                      label="Sources"
+                                      multiple="true">
+                    <f:selectItems value="#{indexBean.sources}" />
+                </p:selectCheckboxMenu>
+            </h:panelGrid>
 
-                <p>
-                    <p:commandButton value="Search" action="result">
-                        <f:param name="keyword" value="#{indexBean.keyword}" />
-                    </p:commandButton>
-                </p>
+            <p>
+                <p:commandButton value="Search" action="result" process="@form"/>
+            </p>
 
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
 
-                    <h:outputText value="Do you want to search in cached publications for your query if it's possible? That's much faster." />
-                    <p:selectBooleanCheckbox value="#{indexBean.cachedSearch}" />
+                <h:outputText value="Do you want to search in cached publications for your query if it's possible? That's much faster." />
+                <p:selectBooleanCheckbox value="#{indexBean.cachedSearch}" />
 
-                </h:panelGrid>
+            </h:panelGrid>
         </h:form>
     </h:body>
 </html>

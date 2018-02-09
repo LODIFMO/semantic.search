@@ -19,4 +19,3 @@ SELECT distinct ?Title ?Authors ?Date
                 FILTER (regex( str(?Title), "${keyword}", "i")).
         }
 GROUP BY ?Title ?Authors ?Date
-LIMIT 10

@@ -1,4 +1,4 @@
-package model;
+package com.gerasin.oleg.semanticsearch.model;
 
 /**
  *

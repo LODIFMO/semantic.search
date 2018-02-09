@@ -1,12 +1,15 @@
 package com.gerasin.oleg.semanticsearch;
 
-import model.Publication;
+import com.gerasin.oleg.semanticsearch.model.Log;
+import com.gerasin.oleg.semanticsearch.model.Publication;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Sorts;
+import java.io.Serializable;
 import java.util.List;
-import model.Log;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 import org.bson.Document;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -15,12 +18,15 @@ import org.mongodb.morphia.Morphia;
  *
  * @author geras
  */
+@Named
+@SessionScoped
 public class DbHelper
+        implements Serializable
 {
     private static final String DB_NAME = "morphia_example_log_2";
     private final Datastore logDatastore;
 
-    private MongoCollection<Document> logCollection;
+    private final MongoCollection<Document> logCollection;
 
     public DbHelper()
     {
@@ -44,8 +50,8 @@ public class DbHelper
         //TO DO: Return log, not publications to show the date of result query
         final List<Log> logs =
                 logDatastore.createQuery(Log.class)
-                                       .field("keyword").equal(keyword)
-                                       .order("-date")
+                                       .field(Log.KEYWORD).equal(keyword)
+                                       .order("-" + Log.DATE)
                                        .asList();
         if (!logs.isEmpty())
         {

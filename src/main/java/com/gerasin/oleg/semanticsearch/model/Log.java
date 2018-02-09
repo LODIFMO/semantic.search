@@ -1,4 +1,4 @@
-package model;
+package com.gerasin.oleg.semanticsearch.model;
 
 import java.util.Date;
 import java.util.List;
