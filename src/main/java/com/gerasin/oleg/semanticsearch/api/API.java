@@ -2,6 +2,7 @@ package com.gerasin.oleg.semanticsearch.api;
 
 import com.gerasin.oleg.semanticsearch.DbHelper;
 import com.gerasin.oleg.semanticsearch.SparqlHelper;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -15,14 +16,10 @@ import javax.ws.rs.core.MediaType;
 @Path("/")
 public class API
 {
+    @Inject
     private SparqlHelper sparqlHelper;
+    @Inject
     private DbHelper dbHelper;
-
-    public API()
-    {
-        this.sparqlHelper = new SparqlHelper();
-        this.dbHelper = new DbHelper();
-    }
 
     @GET
     @Path("publications")

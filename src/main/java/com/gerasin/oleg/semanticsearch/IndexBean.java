@@ -25,7 +25,6 @@ public class IndexBean
 
     private static Logger log = LogManager.getLogger(IndexBean.class.getName());
 
-
     @PostConstruct
     private void init()
     {

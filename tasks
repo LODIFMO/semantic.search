@@ -6,6 +6,8 @@ http://api.springer.com/metadata/json?api_key=be623024c53ff3dcd11fa2343bd303a7&q
 
 http://data.comsode.eu/ru/dataset?q=publications
 }
+disable trace logs
+
 docker
 heroku
 
