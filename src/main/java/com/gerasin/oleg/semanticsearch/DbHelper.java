@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bson.Document;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -30,6 +32,8 @@ public class DbHelper
 
     private final MongoCollection<Document> logCollection;
 
+    private static final Logger log = LogManager.getLogger(DbHelper.class.getName());
+
     public DbHelper()
     {
         final Morphia morphia = new Morphia();
@@ -42,18 +46,18 @@ public class DbHelper
         logDatastore.ensureIndexes();
     }
 
-    public void createLog(String keyword, List<Publication> publications)
+    public void createLog(String keyword, List<String> sources, List<Publication> publications)
     {
-        Log newLog = new Log(keyword, publications);
+        Log newLog = new Log(keyword, sources, publications);
         logDatastore.save(newLog);
     }
 
-    public List<Publication> getCachedPublications(String keyword)
+    public List<Publication> getCachedPublications(String keyword, List<String> sources)
     {
-        //TO DO: Return log, not publications to show the date of result query
         final List<Log> logs =
                 logDatastore.createQuery(Log.class)
                                        .field(Log.KEYWORD).equal(keyword)
+                                       .field(Log.SOURCES).hasAllOf(sources)
                                        .order("-" + Log.DATE)
                                        .asList();
         if (!logs.isEmpty())
@@ -75,5 +79,4 @@ public class DbHelper
 
         return result.toString();
     }
-
 }

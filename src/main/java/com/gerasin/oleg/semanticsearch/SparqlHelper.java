@@ -1,16 +1,21 @@
 package com.gerasin.oleg.semanticsearch;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.gerasin.oleg.semanticsearch.model.Publication;
 import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +29,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.Syntax;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,9 +54,10 @@ public class SparqlHelper
     static final String EUROPE = "Publications Europe";
     static final String OU = "Open University";
     static final String AALTO = "Aalto University";
+    static final String SPRINGER = "Springer";
 
     private final Configuration templateConfig;
-    private final List<Publication> publications;
+    private List<Publication> publications;
     private String keyword;
     private Map<String, Object> data;
 
@@ -60,13 +65,18 @@ public class SparqlHelper
 
     public SparqlHelper()
     {
+        this((ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext());
+    }
+
+    public SparqlHelper(ServletContext context)
+    {
         publications = new ArrayList<>();
 
         templateConfig = new Configuration(Configuration.VERSION_2_3_23);
         templateConfig.setDefaultEncoding("UTF-8");
         templateConfig.setTemplateLoader(
                     new WebappTemplateLoader(
-                            (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext(),
+                            context,
                             "/WEB-INF/query/") );
     }
 
@@ -79,6 +89,7 @@ public class SparqlHelper
 
     public List<Publication> execSelect(String keyword, List<String> selectedSources)
     {
+        publications = new ArrayList<>();
         setKeyword(keyword);
 
         if (selectedSources.contains(OU))
@@ -87,6 +98,8 @@ public class SparqlHelper
             execSelectToAalto();
         if (selectedSources.contains(EUROPE))
             execSelectToEurope();
+        if (selectedSources.contains(SPRINGER))
+            getPublicationsFromSpringer();
 
         return publications;
     }
@@ -165,20 +178,45 @@ public class SparqlHelper
         }
     }
 
-    public String getJsonOutputForKeyword(String keyword)
+    public void getPublicationsFromSpringer()
     {
-        // TO DO: add other query
-        this.keyword = keyword;
-        Query query = QueryFactory.create(getStringForOu(),
-                Syntax.syntaxARQ);
-        query.setLimit(10);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(OU_URL,
-                query);
-        ResultSet results = qe.execSelect();
+        ObjectMapper objectMapper = new ObjectMapper();
+        try
+        {
+            URL url = new URL("http://api.springer.com/metadata/json?api_key=be623024c53ff3dcd11fa2343bd303a7&q=title:"
+                    + keyword);
+            JsonNode node = objectMapper.readTree(url);
+            ArrayNode records = (ArrayNode)node.findValue("records");
+            for (JsonNode record : records)
+            {
+                Publication p = new Publication();
+                p.setSource(SPRINGER);
+                p.setUri(record.findValue("url").findValue("value").asText());
+                p.setTitle(record.findValue("title").asText());
+                p.setDate(record.findValue("publicationDate").asText());
+                p.setAbstract(record.findValue("abstract").asText());
+                p.setAuthors(record.findValue("creators").asText());
+                publications.add(p);
+            }
+        }
+        catch (IOException ex)
+        {
+            log.error("Error while getting publications: ", ex);
+        }
+    }
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ResultSetFormatter.outputAsJSON(outputStream, results);
-        return outputStream.toString();
+    public String getJsonOutputForKeyword(String keyword) throws JsonProcessingException
+    {
+        execSelect(keyword,
+                Arrays.asList(new String[] {
+                    OU,
+                    EUROPE,
+                    AALTO,
+                    SPRINGER
+                }));
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(publications);
     }
 
     public String getStringForEurope()

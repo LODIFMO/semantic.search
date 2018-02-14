@@ -13,6 +13,7 @@ import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -23,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 public class SearchBean
         implements Serializable
 {
-    private static org.apache.logging.log4j.Logger log = LogManager.getLogger(SearchBean.class.getName());
+    private static Logger log = LogManager.getLogger(SearchBean.class.getName());
 
     @Inject
     private SparqlHelper sparqlHelper;
@@ -122,13 +123,13 @@ public class SearchBean
         List<Publication> cachedPublications = null;
         if (cachedSearch)
         {
-            cachedPublications = dbHelper.getCachedPublications(keyword);
+            cachedPublications = dbHelper.getCachedPublications(keyword, selectedSourcesList);
         }
         if (cachedPublications == null)
         {
             log.info("cachedPublications == null ");
             publications = sparqlHelper.execSelect(keyword, selectedSourcesList);
-            dbHelper.createLog(keyword, publications);
+            dbHelper.createLog(keyword, selectedSourcesList, publications);
         }
         else
         {
