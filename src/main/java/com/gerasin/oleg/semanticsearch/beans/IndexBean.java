@@ -33,6 +33,8 @@ public class IndexBean
         sources.add(SparqlHelper.AALTO);
         sources.add(SparqlHelper.EUROPE);
         sources.add(SparqlHelper.SPRINGER);
+
+        selectedSources = new String[] {SparqlHelper.SPRINGER};
     }
 
     public String getKeyword()

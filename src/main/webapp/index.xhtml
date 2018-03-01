@@ -6,31 +6,36 @@
         <title>Semantic search</title>
     </h:head>
     <h:body>
-        <h:form>
-            <p:growl id="msgs" />
+        <h:form prependId="false">
+            <p:messages id="msgs" />
             <p:menubar>
-                <p:menuitem value="#{loginBean.username}" action="profile"/>
+                <p:menuitem value="#{loginBean.username}" action="profile" process="@this"/>
                 <f:facet name="options">
                     <p:commandButton value="Logout"
                                      icon="ui-icon-extlink"
+                                     process="@this"
                                      action="#{loginBean.logout()}"/>
                 </f:facet>
             </p:menubar>
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                 <h:outputLabel for="query" value="Your query: " />
-                <p:inputText  id="query" value="#{indexBean.keyword}"/>
+                <p:inputText  id="query" value="#{indexBean.keyword}" required="true"/>
 
                 <h:outputLabel for="multiple" value="Sources: " />
                 <p:selectCheckboxMenu id="multiple"
                                       value="#{indexBean.selectedSources}"
                                       label="Sources"
+                                      required="true"
                                       multiple="true">
                     <f:selectItems value="#{indexBean.sources}" />
                 </p:selectCheckboxMenu>
             </h:panelGrid>
 
             <p>
-                <p:commandButton value="Search" action="result" process="@form"/>
+                <p:commandButton value="Search"
+                                 action="result"
+                                 process="@form"
+                                 update="msgs"/>
             </p>
 
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">

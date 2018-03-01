@@ -9,11 +9,81 @@
     </h:head>
     <h:body>
         <h:form id="form">
-            <p:dataTable id="publications_data"
+
+            <p:messages id="msgs" closable="true" />
+            <p:menubar>
+                <p:menuitem value="#{loginBean.username}" action="profile"/>
+                <f:facet name="options">
+                    <p:commandButton value="Logout"
+                                     icon="ui-icon-extlink"
+                                     action="#{loginBean.logout()}"/>
+                </f:facet>
+            </p:menubar>
+
+            <p:tabView dynamic="true" cache="true"
+                       rendered="#{not empty searchBean.keyword
+                                   and not empty searchBean.interests}">
+                <p:tab title="Interesting for you">
+                    <p:dataTable id="publications_good"
+                                 var="publication"
+                                 value="#{searchBean.interestingPublications}">
+                        <f:facet name="header">
+                            #{searchBean.goodOutput}
+                        </f:facet>
+                        <p:column headerText="Source">
+                            <h:outputText value="#{publication.source}" />
+                        </p:column>
+
+                        <p:column headerText="Title">
+                            <h:outputText value="#{publication.title}" />
+                        </p:column>
+
+                        <p:column headerText="Date">
+                            <h:outputText value="#{publication.date}" />
+                        </p:column>
+
+                        <p:column style="width:32px;text-align: center">
+                            <p:commandButton update=":form:publicationDetail" oncomplete="PF('publicationDialog').show()" icon="ui-icon-search" title="View">
+                                <f:setPropertyActionListener value="#{publication}" target="#{searchBean.selected}" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Other">
+                    <p:dataTable id="publications_other"
+                                 var="publication"
+                                 value="#{searchBean.otherPublications}">
+                        <f:facet name="header">
+                            #{searchBean.otherOutput}
+                        </f:facet>
+                        <p:column headerText="Source">
+                            <h:outputText value="#{publication.source}" />
+                        </p:column>
+
+                        <p:column headerText="Title">
+                            <h:outputText value="#{publication.title}" />
+                        </p:column>
+
+                        <p:column headerText="Date">
+                            <h:outputText value="#{publication.date}" />
+                        </p:column>
+
+                        <p:column style="width:32px;text-align: center">
+                            <p:commandButton update=":form:publicationDetail" oncomplete="PF('publicationDialog').show()" icon="ui-icon-search" title="View">
+                                <f:setPropertyActionListener value="#{publication}" target="#{searchBean.selected}" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+
+            <p:dataTable id="publications_good"
+                         rendered="#{empty searchBean.interests
+                                     and not empty searchBean.keyword}"
                          var="publication"
                          value="#{searchBean.publications}">
                 <f:facet name="header">
-                    #{searchBean.output}
+                            #{searchBean.output}
                 </f:facet>
                 <p:column headerText="Source">
                     <h:outputText value="#{publication.source}" />

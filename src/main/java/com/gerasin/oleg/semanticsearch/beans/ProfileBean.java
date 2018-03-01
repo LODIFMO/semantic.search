@@ -3,6 +3,7 @@ package com.gerasin.oleg.semanticsearch.beans;
 import com.gerasin.oleg.semanticsearch.helpers.DbHelper;
 import com.gerasin.oleg.semanticsearch.model.User;
 import java.io.Serializable;
+import java.util.ArrayList;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -31,6 +32,11 @@ public class ProfileBean
     public String save()
     {
         User user = loginBean.getUser();
+
+        if (user.getInterests() == null)
+        {
+            user.setInterests(new ArrayList<>());
+        }
 
         dbHelper.updateInterests(user);
 

@@ -6,12 +6,14 @@
         <title>Semantic search</title>
     </h:head>
     <h:body>
-        <h:form>
+        <h:form prependId="false">
+            <p:messages id="msgs" />
             <p:menubar>
-                <p:menuitem value="#{loginBean.username}"/>
+                <p:menuitem value="#{loginBean.username}" action="profile" process="@this"/>
                 <f:facet name="options">
                     <p:commandButton value="Logout"
                                      icon="ui-icon-extlink"
+                                     process="@this"
                                      action="#{loginBean.logout()}"/>
                 </f:facet>
             </p:menubar>

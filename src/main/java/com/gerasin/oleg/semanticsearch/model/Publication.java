@@ -1,10 +1,13 @@
 package com.gerasin.oleg.semanticsearch.model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author geras
  */
 public class Publication
+        implements Serializable
 {
     private String Source;
     private String Uri;

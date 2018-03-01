@@ -1,5 +1,6 @@
 package com.gerasin.oleg.semanticsearch.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -12,6 +13,7 @@ import org.mongodb.morphia.annotations.Id;
  */
 @Entity(Log.ENTITY_NAME)
 public class Log
+        implements Serializable
 {
     public static final String ENTITY_NAME = "Log";
 
