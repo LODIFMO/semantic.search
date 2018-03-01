@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Semantic search</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:menubar>
+                <p:menuitem value="#{loginBean.username}"/>
+                <f:facet name="options">
+                    <p:commandButton value="Logout"
+                                     icon="ui-icon-extlink"
+                                     action="#{loginBean.logout()}"/>
+                </f:facet>
+            </p:menubar>
+
+
+            <!-- content -->
+        </h:form>
+    </h:body>
+</html>

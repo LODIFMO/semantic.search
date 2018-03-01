@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Semantic search</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:growl id="msgs" />
+            <p:menubar>
+                <p:menuitem value="#{loginBean.username}"
+                            action="profile"/>
+                <f:facet name="options">
+                    <p:commandButton value="Logout"
+                                     icon="ui-icon-extlink"
+                                     action="#{loginBean.logout()}"/>
+                </f:facet>
+            </p:menubar>
+            <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                <h:outputLabel for="interests" value="Your interests: " />
+                <p:chips id="interests"
+                         value="#{loginBean.user.interests}"/>
+            </h:panelGrid>
+
+            <p>
+                <p:commandButton value="Save"
+                                 action="#{profileBean.save()}"
+                                 icon="ui-icon-disk"
+                                 process="@form"
+                                 update="msgs"/>
+                <p:button value="Cancel" outcome="index"/>
+            </p>
+        </h:form>
+    </h:body>
+</html>

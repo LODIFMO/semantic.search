@@ -81,16 +81,17 @@ public class DbHelper
         return result.toString();
     }
 
-    public boolean validateUser(String user, String password)
+    //<editor-fold defaultstate="collapsed" desc="wotrk with user">
+    public User validateUser(String user, String password)
     {
         return datastore
                 .createQuery(User.class)
                 .field(User.NAME).equal(user)
                 .field(User.PASSWORD).equal(password)
-                .get() != null;
+                .get();
     }
 
-    public boolean createUser(String user, String password)
+    public User createUser(String user, String password)
     {
         boolean isAlreadyExists = datastore
                 .createQuery(User.class)
@@ -99,13 +100,22 @@ public class DbHelper
 
         if (isAlreadyExists)
         {
-            return false;
+            return null;
         }
 
         User newUser = new User(user, password);
 
         datastore.save(newUser);
 
-        return true;
+        return newUser;
     }
+
+    public void updateInterests(User user)
+    {
+        datastore.update(
+                user,
+                datastore.createUpdateOperations(User.class)
+                        .set(User.INTERESTS, user.getInterests()));
+    }
+    //</editor-fold>
 }

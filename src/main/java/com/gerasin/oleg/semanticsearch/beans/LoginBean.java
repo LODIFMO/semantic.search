@@ -1,6 +1,7 @@
 package com.gerasin.oleg.semanticsearch.beans;
 
 import com.gerasin.oleg.semanticsearch.helpers.DbHelper;
+import com.gerasin.oleg.semanticsearch.model.User;
 import com.gerasin.oleg.semanticsearch.util.SessionUtils;
 import java.io.Serializable;
 import javax.enterprise.context.SessionScoped;
@@ -21,9 +22,9 @@ import org.apache.logging.log4j.Logger;
 public class LoginBean
         implements Serializable
 {
-
     private String username;
     private String password;
+    private User user;
 
     @Inject
     private DbHelper dbHelper;
@@ -32,11 +33,12 @@ public class LoginBean
 
     public String validateUsernamePassword()
     {
-        boolean valid = dbHelper.validateUser(username, password);
+        User usr = dbHelper.validateUser(username, password);
 
-        if (valid)
+        if (usr != null)
         {
             log.info("user {} is valid", username);
+            user = usr;
             HttpSession session = SessionUtils.getSession();
             session.setAttribute("username", username);
             return "index";
@@ -49,15 +51,15 @@ public class LoginBean
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             "Incorrect Username or Password",
                             "Please enter correct username and Password"));
-            return "login";
+            return "";
         }
     }
 
     public String createUser()
     {
-        boolean valid = dbHelper.createUser(username, password);
+        User usr = dbHelper.createUser(username, password);
 
-        if (valid)
+        if (usr != null)
         {
             log.info("user {} is created", username);
             HttpSession session = SessionUtils.getSession();
@@ -70,9 +72,9 @@ public class LoginBean
             FacesContext.getCurrentInstance().addMessage(
                     null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "User with Username " + username + "is already exists",
+                            "User with Username '" + username + "' is already exists",
                             "Please enter correct username and Password"));
-            return "login";
+            return "";
         }
     }
 
@@ -105,6 +107,16 @@ public class LoginBean
     public void setPassword(String password)
     {
         this.password = password;
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
+
+    public void setUser(User user)
+    {
+        this.user = user;
     }
     //</editor-fold>
 }

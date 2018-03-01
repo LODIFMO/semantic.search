@@ -6,14 +6,14 @@
         <title>Semantic search</title>
     </h:head>
     <h:body>
-        <h:form>
+        <h:form prependId="false">
             <p:messages id="msgs" />
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                 <h:outputLabel for="username" value="Username: " />
                 <p:inputText id="username" value="#{loginBean.username}" required="true"/>
 
-                <h:outputLabel for="pass" value="Password: " />
-                <p:password id="pass" value="#{loginBean.password}" required="true"/>
+                <h:outputLabel for="password" value="Password: " />
+                <p:password id="password" value="#{loginBean.password}" required="true"/>
 
             </h:panelGrid>
 
@@ -24,6 +24,7 @@
                                  process="@form"/>
                 <p:commandButton value="Sign up"
                                  action="#{loginBean.createUser}"
+                                 update="msgs"
                                  process="@form"/>
             </p>
         </h:form>

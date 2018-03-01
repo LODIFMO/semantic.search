@@ -7,6 +7,15 @@
     </h:head>
     <h:body>
         <h:form>
+            <p:growl id="msgs" />
+            <p:menubar>
+                <p:menuitem value="#{loginBean.username}" action="profile"/>
+                <f:facet name="options">
+                    <p:commandButton value="Logout"
+                                     icon="ui-icon-extlink"
+                                     action="#{loginBean.logout()}"/>
+                </f:facet>
+            </p:menubar>
             <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                 <h:outputLabel for="query" value="Your query: " />
                 <p:inputText  id="query" value="#{indexBean.keyword}"/>
