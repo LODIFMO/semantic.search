@@ -1,7 +1,8 @@
-package com.gerasin.oleg.semanticsearch;
+package com.gerasin.oleg.semanticsearch.helpers;
 
 import com.gerasin.oleg.semanticsearch.model.Log;
 import com.gerasin.oleg.semanticsearch.model.Publication;
+import com.gerasin.oleg.semanticsearch.model.User;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
@@ -28,9 +29,8 @@ public class DbHelper
 {
     private static final String DB_NAME = "heroku_6pwfv8hk";
     private static final String MONGO_CLIENT_URI = "mongodb://heroku_6pwfv8hk:ppmjcftfp61mitqs1gs72g1di2@ds231228.mlab.com:31228/heroku_6pwfv8hk";
-    private final Datastore logDatastore;
-
-    private final MongoCollection<Document> logCollection;
+    private final MongoDatabase database;
+    private final Datastore datastore;
 
     private static final Logger log = LogManager.getLogger(DbHelper.class.getName());
 
@@ -40,22 +40,21 @@ public class DbHelper
         morphia.mapPackage("model");
         MongoClientURI uri  = new MongoClientURI(MONGO_CLIENT_URI);
         MongoClient mongoClient = new MongoClient(uri);
-        logDatastore = morphia.createDatastore(mongoClient, DB_NAME);
-        MongoDatabase database = mongoClient.getDatabase(uri.getDatabase());
-        logCollection = database.getCollection(Log.ENTITY_NAME);
-        logDatastore.ensureIndexes();
+        database = mongoClient.getDatabase(uri.getDatabase());
+        datastore = morphia.createDatastore(mongoClient, DB_NAME);
+        datastore.ensureIndexes();
     }
 
     public void createLog(String keyword, List<String> sources, List<Publication> publications)
     {
         Log newLog = new Log(keyword, sources, publications);
-        logDatastore.save(newLog);
+        datastore.save(newLog);
     }
 
     public List<Publication> getCachedPublications(String keyword, List<String> sources)
     {
         final List<Log> logs =
-                logDatastore.createQuery(Log.class)
+                datastore.createQuery(Log.class)
                                        .field(Log.KEYWORD).equal(keyword)
                                        .field(Log.SOURCES).hasAllOf(sources)
                                        .order("-" + Log.DATE)
@@ -72,11 +71,41 @@ public class DbHelper
     {
         StringBuilder result = new StringBuilder();
 
+        MongoCollection<Document> logCollection = database.getCollection(Log.ENTITY_NAME);
+
         for ( Document cur : logCollection.find().sort(Sorts.descending(Log.DATE)) )
         {
             result.append(cur.toJson()).append("\n");
         }
 
         return result.toString();
+    }
+
+    public boolean validateUser(String user, String password)
+    {
+        return datastore
+                .createQuery(User.class)
+                .field(User.NAME).equal(user)
+                .field(User.PASSWORD).equal(password)
+                .get() != null;
+    }
+
+    public boolean createUser(String user, String password)
+    {
+        boolean isAlreadyExists = datastore
+                .createQuery(User.class)
+                .field(User.NAME).equal(user)
+                .get() != null;
+
+        if (isAlreadyExists)
+        {
+            return false;
+        }
+
+        User newUser = new User(user, password);
+
+        datastore.save(newUser);
+
+        return true;
     }
 }

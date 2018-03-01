@@ -1,9 +1,10 @@
-package com.gerasin.oleg.semanticsearch;
+package com.gerasin.oleg.semanticsearch.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.gerasin.oleg.semanticsearch.beans.IndexBean;
 import com.gerasin.oleg.semanticsearch.model.Publication;
 import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
@@ -51,10 +52,10 @@ public class SparqlHelper
     private static final String OU_URL = "http://data.open.ac.uk/sparql?force=true";
     private static final String AALTO_URL = "http://data.aalto.fi/sparql";
 
-    static final String EUROPE = "Publications Europe";
-    static final String OU = "Open University";
-    static final String AALTO = "Aalto University";
-    static final String SPRINGER = "Springer";
+    public static final String EUROPE = "Publications Europe";
+    public static final String OU = "Open University";
+    public static final String AALTO = "Aalto University";
+    public static final String SPRINGER = "Springer";
 
     private final Configuration templateConfig;
     private List<Publication> publications;
@@ -116,13 +117,12 @@ public class SparqlHelper
         while (results.hasNext())
         {
             QuerySolution qs = results.next();
-            String source = EUROPE;
             String uri = qs.get("URI").toString();
             String title = qs.get("title").toString();
             String authors = qs.get("authors").toString();
             String date = qs.get("date").toString();
             date = date.replace("^^http://www.w3.org/2001/XMLSchema#date", "");
-            publications.add(new Publication(source, uri, title, authors, date, null));
+            publications.add(new Publication(EUROPE, uri, title, authors, date, null));
         }
     }
 
@@ -143,11 +143,10 @@ public class SparqlHelper
                 return;
             }
 
-            String source = AALTO;
             String title = qs.get("Title").toString();
             String authors = qs.get("Authors").toString();
             String date = qs.get("Date").toString();
-            publications.add(new Publication(source, null, title, authors, date, null));
+            publications.add(new Publication(AALTO, null, title, authors, date, null));
         }
      }
 
@@ -167,14 +166,13 @@ public class SparqlHelper
             {
                 return;
             }
-            String source = OU;
             String uri = qs.get("URI").toString();
             String title = qs.get("title").toString();
             String authors = qs.get("authors").toString();
             String date = qs.get("date").toString();
             date = date.replace("^^http://www.w3.org/2001/XMLSchema#date", "");
             String description = qs.get("abstract").toString();
-            publications.add(new Publication(source, uri, title, authors, date, description));
+            publications.add(new Publication(OU, uri, title, authors, date, description));
         }
     }
 

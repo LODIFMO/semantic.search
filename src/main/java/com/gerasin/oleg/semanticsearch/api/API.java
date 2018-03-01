@@ -1,8 +1,8 @@
 package com.gerasin.oleg.semanticsearch.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.gerasin.oleg.semanticsearch.DbHelper;
-import com.gerasin.oleg.semanticsearch.SparqlHelper;
+import com.gerasin.oleg.semanticsearch.helpers.DbHelper;
+import com.gerasin.oleg.semanticsearch.helpers.SparqlHelper;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

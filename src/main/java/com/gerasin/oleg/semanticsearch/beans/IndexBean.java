@@ -1,5 +1,6 @@
-package com.gerasin.oleg.semanticsearch;
+package com.gerasin.oleg.semanticsearch.beans;
 
+import com.gerasin.oleg.semanticsearch.helpers.SparqlHelper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
